@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gofilepy"
+version = "1.0.0"
+description = "A Python CLI and Library for gofile.io"
+readme = "README.md"
+authors = [{ name = "Garnajee", email = "62147746+garnajee@users.noreply.github.com" }]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "httpx",  # The modern HTTP client
+    "tqdm"    # Progress bar
+]
+
+[project.scripts]
+gofilepy = "gofilepy.cli:main"
