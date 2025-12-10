@@ -1,15 +1,17 @@
 # GofilePy
 
+[![Build and Release](https://github.com/garnajee/gofilepy/actions/workflows/build_release.yml/badge.svg)](https://github.com/garnajee/gofilepy/actions/workflows/build_release.yml)
+
 A Python library and CLI tool for [Gofile.io](https://gofile.io). 
 It supports the free API tiers, streaming uploads (low memory usage for large files), and script-friendly JSON output.
 
 ## Features
 
-- 🚀 **Streaming Uploads**: Upload 100GB+ files without loading them into RAM.
-- 📂 **Folder Management**: Upload to specific folders or create new ones automatically.
-- 🤖 **Script Ready**: JSON output mode for easy parsing in pipelines.
-- 🆓 **Free Tier Support**: Handles Guest accounts and Standard tokens.
-- 📊 **Progress Bar**: Visual feedback for long uploads.
+- **Streaming Uploads**: Upload 100GB+ files without loading them into RAM.
+- **Folder Management**: Upload to specific folders or create new ones automatically.
+- **Script Ready**: JSON output mode for easy parsing in pipelines.
+- **Free Tier Support**: Handles Guest accounts and Standard tokens.
+- **Progress Bar**: Visual feedback for long uploads.
 
 ## Installation
 
