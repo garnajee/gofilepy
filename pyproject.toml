@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gofilepy"
-version = "1.1.1"
+version = "1.1.2"
 description = "A Python CLI and Library for gofile.io"
 readme = "README.md"
 authors = [{ name = "Garnajee", email = "62147746+garnajee@users.noreply.github.com" }]
