@@ -22,10 +22,14 @@ class GofileClient:
             self.client.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def _handle_response(self, response: httpx.Response) -> Dict:
+        logger.debug(f"Response Status: {response.status_code}")
+
         try:
             data = response.json()
+            logger.debug(f"Response Body: {data}")
         except Exception:
-            logger.error(f"Failed to parse JSON: {response.text}")
+            error_text = response.text.strip()
+            logger.debug(f"Failed to parse JSON: {error_text}")
             response.raise_for_status()
             return {}
 

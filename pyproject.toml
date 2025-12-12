@@ -16,8 +16,9 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 dependencies = [
-    "httpx",  # The modern HTTP client
-    "tqdm"    # Progress bar
+    "httpx", # The modern HTTP client
+    "python-dotenv>=0.21.1", # Progress bar
+    "tqdm",
 ]
 
 [project.scripts]

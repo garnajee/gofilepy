@@ -5,6 +5,7 @@ import os
 import json
 import logging
 from tqdm import tqdm
+from dotenv import load_dotenv
 from .client import GofileClient
 
 # Configure Logging
@@ -12,6 +13,8 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger("gofilepy")
 
 def main():
+    load_dotenv()
+
     parser = argparse.ArgumentParser(description="Gofile.io CLI Uploader (HTTPX Edition)")
     
     parser.add_argument("files", nargs='+', help="Files to upload")
@@ -41,8 +44,13 @@ def main():
 
     # Token Logic
     token = os.environ.get("GOFILE_TOKEN")
-    if not token and args.to_single_folder and not args.folder_id:
-        logger.debug("No token found. Proceeding as Guest.")
+    if token:
+        masked_token = f"{token[:4]}..."
+        if not args.json:
+            logger.info(f"🔑 Token loaded: {masked_token}")
+    else:
+        if not args.json:
+            logger.warning("⚠️ No GOFILE_TOKEN found in .env or environment. Running as Guest.")
 
     client = GofileClient(token=token)
     
