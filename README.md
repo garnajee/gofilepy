@@ -17,11 +17,24 @@ It supports the free API tiers, streaming uploads (low memory usage for large fi
 
 ### From Source
 
-1. Clone the repository.
-2. Install via pip:
-
+1. Clone the repository:
 ```bash
-pip install .
+git clone https://github.com/garnajee/gofilepy.git && cd gofilepy
+```
+
+2. Install via [uv](https://docs.astral.sh/uv/getting-started/installation/):
+```bash
+uv sync
+```
+
+3. Running the CLI
+```bash
+uv run gofilepy --help
+```
+
+4. (Optional) Install the package in your environment
+```bash
+uv pip install .
 ```
 
 ## Usage (CLI)
@@ -75,56 +88,13 @@ gofilepy -vv big_file.iso
 You can use `gofilepy` in your own Python scripts.
 
 ```python
-import os
 from gofilepy import GofileClient
-from tqdm import tqdm
 
-TOKEN = os.environ.get("GOFILE_TOKEN") # in .env file, or put it here
-FILES_TO_UPLOAD = [
-    "/path/to/video1.mp4",
-    "/path/to/image.jpg"
-]
-FOLDER_ID = None # None to create new folder, or put folder ID here
-
-def upload_files():
-    client = GofileClient(token=TOKEN)
-    
-    print(f"Starting upload... {len(FILES_TO_UPLOAD)}")
-
-    for file_path in FILES_TO_UPLOAD:
-        if not os.path.exists(file_path):
-            print(f"❌ File not found: {file_path}")
-            continue
-
-        filename = os.path.basename(file_path)
-        filesize = os.path.getsize(file_path)
-
-        with tqdm(total=filesize, unit='B', unit_scale=True, desc=filename) as pbar:
-            
-            def progress_callback(bytes_read):
-                uploaded_so_far = pbar.n
-                pbar.update(bytes_read - uploaded_so_far)
-
-            try:
-                response = client.upload_file(
-                    file_path=file_path, 
-                    folder_id=FOLDER_ID, 
-                    callback=progress_callback
-                )
-                
-                global FOLDER_ID
-                if FOLDER_ID is None and 'parentFolder' in response:
-                    FOLDER_ID = response['parentFolder']
-                
-                pbar.update(filesize - pbar.n)
-                
-                tqdm.write(f"✅ Success : {response.get('downloadPage')}")
-
-            except Exception as e:
-                tqdm.write(f"❌ Error, {filename}: {e}")
-
-if __name__ == "__main__":
-    upload_files()
+client = GofileClient()
+# client = GofileClient(token="YOUR_TOKEN_HERE")  # Optional token for private uploads
+file = client.upload(file=open("./test.py", "rb"))
+print(file.name)
+print(file.page_link)  # View and download file at this link
 ```
 
 ## Building for Release

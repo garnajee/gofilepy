@@ -3,10 +3,22 @@
 import httpx
 import logging
 import os
-from typing import Optional, List, Dict, Callable
+from typing import Optional, List, Dict, Callable, BinaryIO, Union
 from .utils import ProgressFileReader
 
 logger = logging.getLogger(__name__)
+
+class GofileFile:
+    """Represents an uploaded file on Gofile"""
+    def __init__(self, data: Dict):
+        self._data = data
+        self.name = data.get("fileName", "")
+        self.page_link = data.get("downloadPage", "")
+        self.file_id = data.get("fileId", "")
+        self.parent_folder = data.get("parentFolder", "")
+        
+    def __repr__(self):
+        return f"GofileFile(name='{self.name}', page_link='{self.page_link}')"
 
 class GofileClient:
     API_ROOT = "https://api.gofile.io"
@@ -64,13 +76,22 @@ class GofileClient:
         res = self.client.request("DELETE", url, json={"contentsId": ",".join(content_ids)})
         return self._handle_response(res)
 
-    def upload_file(self, 
-                    file_path: str, 
-                    folder_id: Optional[str] = None, 
-                    callback: Optional[Callable[[int], None]] = None) -> Dict:
+    def upload(self, 
+               file: Union[str, BinaryIO], 
+               folder_id: Optional[str] = None, 
+               callback: Optional[Callable[[int], None]] = None) -> GofileFile:
+        """
+        Upload a file to Gofile.
         
+        Args:
+            file: Either a file path (str) or a file object opened in binary mode
+            folder_id: Optional folder ID to upload to
+            callback: Optional progress callback function
+            
+        Returns:
+            GofileFile object with name and page_link attributes
+        """
         server_url = f"{self.get_server()}/uploadfile"
-        file_name = os.path.basename(file_path)
         
         # Prepare parameters
         data = {}
@@ -79,18 +100,31 @@ class GofileClient:
         if folder_id:
             data["folderId"] = folder_id
 
-        # Use our custom ProgressFileReader
-        # If no callback is provided, we use a dummy lambda to avoid errors
         progress_callback = callback if callback else lambda x: None
         
-        logger.info(f"Starting upload: {file_name} -> {server_url}")
-        
-        # Open file using our wrapper
-        with ProgressFileReader(file_path, progress_callback) as f:
-            files = {'file': (file_name, f)}
+        # Handle file path (string)
+        if isinstance(file, str):
+            file_name = os.path.basename(file)
+            logger.info(f"Starting upload: {file_name} -> {server_url}")
             
-            # Use a longer timeout for the upload specifically (None = infinite)
-            # This is crucial for 2000GB files
+            with ProgressFileReader(file, progress_callback) as f:
+                files = {'file': (file_name, f)}
+                res = self.client.post(
+                    server_url, 
+                    data=data, 
+                    files=files, 
+                    timeout=None 
+                )
+        # Handle file object
+        else:
+            file_name = getattr(file, 'name', 'uploaded_file')
+            if hasattr(file_name, '__fspath__'):  # Path object
+                file_name = os.path.basename(file_name)
+            elif '/' in str(file_name) or '\\' in str(file_name):
+                file_name = os.path.basename(str(file_name))
+            
+            logger.info(f"Starting upload: {file_name} -> {server_url}")
+            files = {'file': (file_name, file)}
             res = self.client.post(
                 server_url, 
                 data=data, 
@@ -98,4 +132,16 @@ class GofileClient:
                 timeout=None 
             )
 
-        return self._handle_response(res)
+        response_data = self._handle_response(res)
+        return GofileFile(response_data)
+
+    def upload_file(self, 
+                    file_path: str, 
+                    folder_id: Optional[str] = None, 
+                    callback: Optional[Callable[[int], None]] = None) -> Dict:
+        """
+        Legacy method for uploading files (returns raw dict).
+        Use upload() method for a cleaner API.
+        """
+        result = self.upload(file_path, folder_id, callback)
+        return result._data

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from .client import GofileClient
+from .client import GofileClient, GofileFile
 
-__version__ = "1.0.0"
-__all__ = ["GofileClient"]
+__version__ = "1.1.1"
+__all__ = ["GofileClient", "GofileFile"]
 
