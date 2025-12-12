@@ -1,7 +1,20 @@
-#!/usr/bin/env python3
+"""Top-level package exports for GofilePy."""
 
-from .client import GofileClient
+from .client import (
+	GofileAPIError,
+	GofileClient,
+	GofileError,
+	GofileFile,
+	GofileNetworkError,
+	GofileUploadError,
+)
 
-__version__ = "1.0.0"
-__all__ = ["GofileClient"]
-
+__version__ = "1.1.2"
+__all__ = [
+	"GofileClient",
+	"GofileFile",
+	"GofileError",
+	"GofileAPIError",
+	"GofileNetworkError",
+	"GofileUploadError",
+]
