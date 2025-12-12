@@ -97,6 +97,25 @@ print(file.name)
 print(file.page_link)  # View and download file at this link
 ```
 
+## Development
+
+For contributors and developers:
+
+1. Install with development dependencies:
+```bash
+uv sync --extra dev
+```
+
+2. Run pylint to check code quality:
+```bash
+uv run pylint src/gofilepy
+```
+
+3. Install in editable mode for development:
+```bash
+uv pip install -e .
+```
+
 ## Building for Release
 
 To build a `.whl` (Wheel) file and a source distribution:
