@@ -264,6 +264,9 @@ class GofileClient:
         }
         headers = {
             # to avoid error-notPremium
+            # from https://gofile.io/dist/js/config.js
+            # appdata.wt = "4fd6sg89d7s6"
+            # is it constant? seems so?
             "x-website-token": "4fd6sg89d7s6"
         }
         return self._request(
