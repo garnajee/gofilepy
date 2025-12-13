@@ -1,28 +1,20 @@
-#!/usr/bin/env python3
+"""Utility helpers for GofilePy."""
 
-import typing
+from __future__ import annotations
+
 import io
+from typing import BinaryIO, Callable
+
 
 class ProgressFileReader(io.BufferedReader):
-    """
-    Wraps a file object to trigger a callback when data is read.
-    This allows monitoring upload progress in httpx without loading the file into RAM.
-    """
-    def __init__(self, filename: str, callback: typing.Callable[[int], None]):
-        self._f = open(filename, 'rb')
-        self._callback = callback
-        # Get file size for verification if needed, or just standard init
-        super().__init__(self._f)
+    """Buffered reader that reports read progress through a callback."""
 
-    def read(self, size: int = -1) -> bytes:
-        # Read the chunk from disk
-        chunk = self._f.read(size)
-        # Update the progress bar with the length of the chunk read
+    def __init__(self, file_obj: BinaryIO, callback: Callable[[int], None]):
+        self._callback = callback
+        super().__init__(file_obj)
+
+    def read(self, size: int = -1) -> bytes:  # type: ignore[override]
+        chunk = super().read(size)
         if chunk:
             self._callback(len(chunk))
         return chunk
-
-    def close(self) -> None:
-        if hasattr(self, '_f'):
-            self._f.close()
-

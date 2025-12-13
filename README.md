@@ -8,20 +8,34 @@ It supports the free API tiers, streaming uploads (low memory usage for large fi
 ## Features
 
 - **Streaming Uploads**: Upload 100GB+ files without loading them into RAM.
+- **Download Support**: Download files from Gofile URLs or content IDs.
 - **Folder Management**: Upload to specific folders or create new ones automatically.
 - **Script Ready**: JSON output mode for easy parsing in pipelines.
 - **Free Tier Support**: Handles Guest accounts and Standard tokens.
-- **Progress Bar**: Visual feedback for long uploads.
+- **Progress Bar**: Visual feedback for long uploads and downloads.
 
 ## Installation
 
 ### From Source
 
-1. Clone the repository.
-2. Install via pip:
-
+1. Clone the repository:
 ```bash
-pip install .
+git clone https://github.com/garnajee/gofilepy.git && cd gofilepy
+```
+
+2. Install via [uv](https://docs.astral.sh/uv/getting-started/installation/):
+```bash
+uv sync
+```
+
+3. Running the CLI
+```bash
+uv run gofilepy --help
+```
+
+4. (Optional) Install the package in your environment
+```bash
+uv pip install .
 ```
 
 ## Usage (CLI)
@@ -55,6 +69,24 @@ Upload multiple files. The first file creates a folder, and the rest are uploade
 gofilepy -s part1.rar part2.rar part3.rar
 ```
 
+### Download Files
+Download files from a Gofile URL or content ID.
+
+Download from URL:
+```bash
+gofilepy -d https://gofile.io/d/GxHNKL
+```
+
+Download from content ID:
+```bash
+gofilepy -d GxHNKL
+```
+
+Download to specific directory
+```bash
+gofilepy -d GxHNKL -o ./downloads
+```
+
 ### Scripting Mode (JSON Output)
 Use `--json` to suppress human-readable text and output a JSON array.
 
@@ -74,57 +106,46 @@ gofilepy -vv big_file.iso
 
 You can use `gofilepy` in your own Python scripts.
 
+### Upload Files
+
 ```python
-import os
 from gofilepy import GofileClient
-from tqdm import tqdm
 
-TOKEN = os.environ.get("GOFILE_TOKEN") # in .env file, or put it here
-FILES_TO_UPLOAD = [
-    "/path/to/video1.mp4",
-    "/path/to/image.jpg"
-]
-FOLDER_ID = None # None to create new folder, or put folder ID here
+client = GofileClient()
+# client = GofileClient(token="YOUR_TOKEN_HERE")  # Optional token for private uploads
+file = client.upload(file=open("./test.py", "rb"))
+print(file.name)
+print(file.page_link)  # View and download file at this link
+```
 
-def upload_files():
-    client = GofileClient(token=TOKEN)
-    
-    print(f"Starting upload... {len(FILES_TO_UPLOAD)}")
+### Download Files
 
-    for file_path in FILES_TO_UPLOAD:
-        if not os.path.exists(file_path):
-            print(f"❌ File not found: {file_path}")
-            continue
+```python
+from gofilepy import GofileClient
 
-        filename = os.path.basename(file_path)
-        filesize = os.path.getsize(file_path)
+client = GofileClient()
+contents = client.get_contents("GxHNKL")
+print("Folder contents:")
+print(contents)
+```
 
-        with tqdm(total=filesize, unit='B', unit_scale=True, desc=filename) as pbar:
-            
-            def progress_callback(bytes_read):
-                uploaded_so_far = pbar.n
-                pbar.update(bytes_read - uploaded_so_far)
+## Development
 
-            try:
-                response = client.upload_file(
-                    file_path=file_path, 
-                    folder_id=FOLDER_ID, 
-                    callback=progress_callback
-                )
-                
-                global FOLDER_ID
-                if FOLDER_ID is None and 'parentFolder' in response:
-                    FOLDER_ID = response['parentFolder']
-                
-                pbar.update(filesize - pbar.n)
-                
-                tqdm.write(f"✅ Success : {response.get('downloadPage')}")
+For contributors and developers:
 
-            except Exception as e:
-                tqdm.write(f"❌ Error, {filename}: {e}")
+1. Install with development dependencies:
+```bash
+uv sync --extra dev
+```
 
-if __name__ == "__main__":
-    upload_files()
+2. Run pylint to check code quality:
+```bash
+uv run pylint src/gofilepy
+```
+
+3. Install in editable mode for development:
+```bash
+uv pip install -e .
 ```
 
 ## Building for Release
