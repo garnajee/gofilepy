@@ -7,7 +7,7 @@ from gofilepy import GofileClient
 client = GofileClient()
 
 # Get folder contents
-contents = client.get_contents("GxHNKL")
+contents = client.get_contents("QUo3a5")
 print("Folder contents:")
 print(contents)
 

@@ -236,12 +236,12 @@ class GofileClient:
         logger.debug("Creating guest account")
         url = f"{self.API_ROOT}/accounts"
         response = self._request("POST", url, context={"action": "create_guest"})
-        
+
         if "token" in response:
             self.token = str(response["token"])
             self.client.headers.update({"Authorization": f"Bearer {self.token}"})
             logger.debug("Guest account created with token: %s***", self.token[:4])
-        
+
         return response
 
     def get_contents(self, content_id: str) -> Dict[str, Any]:
@@ -263,9 +263,12 @@ class GofileClient:
             "sortDirection": "1"
         }
         headers = {
-            "x-website-token": "4fd6sg89d7s6" # to avoid error-notPremium
+            # to avoid error-notPremium
+            "x-website-token": "4fd6sg89d7s6"
         }
-        return self._request("GET", url, params=params, headers=headers, context={"content_id": content_id})
+        return self._request(
+            "GET", url, params=params, headers=headers, context={"content_id": content_id}
+        )
 
     def download_file(
         self,
@@ -276,28 +279,28 @@ class GofileClient:
         """Download a file from the provided direct link."""
 
         logger.info("Starting download: %s -> %s", download_url, output_path)
-        
+
         cookies = {}
         if self.token:
             cookies["accountToken"] = self.token
             logger.debug("Using accountToken cookie for download")
-        
+
         try:
             with self.client.stream("GET", download_url, cookies=cookies, timeout=None) as response:
                 response.raise_for_status()
-                
+
                 total_size = int(response.headers.get("content-length", 0))
                 logger.debug("File size: %s bytes", total_size)
-                
+
                 os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-                
+
                 with open(output_path, "wb") as f:
                     for chunk in response.iter_bytes(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
                             if callback:
                                 callback(len(chunk))
-                
+
                 logger.info("Download complete: %s", output_path)
         except httpx.HTTPError as exc:
             logger.error("Download failed for %s: %s", download_url, exc)
