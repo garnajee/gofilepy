@@ -1,4 +1,6 @@
-"""Top-level package exports for GofilePy."""
+# __init__.py
+# Author: Garnajee
+# License: MIT
 
 from .client import (
 	GofileAPIError,
