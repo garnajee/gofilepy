@@ -16,6 +16,13 @@ It supports the free API tiers, streaming uploads (low memory usage for large fi
 
 ## Installation
 
+### With pip
+
+You can install the library directly from the source without cloning the repository manually:
+```bash
+pip install git+https://github.com/garnajee/gofilepy.git
+```
+
 ### From Source
 
 1. Clone the repository:
