@@ -23,6 +23,13 @@ You can install the library directly from the source without cloning the reposit
 pip install git+https://github.com/garnajee/gofilepy.git
 ```
 
+### With uv (without installing!)
+
+You use the library directly from the source without installing or cloning the repository manually (it'll be in cache folder):
+```bash
+uvx --from git+https://github.com/garnajee/gofilepy.git gofilepy -h
+```
+
 ### From Source
 
 1. Clone the repository:
