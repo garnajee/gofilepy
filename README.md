@@ -77,7 +77,7 @@ gofilepy -f "folder-uuid-123" image.png
 ```
 
 > [!TIP]
-> To find the uuid, just the "..." under the folder's name, and copy the `id` in "General Information"
+> To find the `uuid`, just click on the "..." under the folder's name, and copy the `id` in "General Information"
 
 ### Group Upload (Single Folder)
 Upload multiple files. The first file creates a folder, and the rest are uploaded into it.
